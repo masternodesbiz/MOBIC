@@ -1,0 +1,144 @@
+name: Build and Extract Files from Docker Container
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-files-linux-x64:
+    runs-on: ubuntu-22.04
+    # if: ${{ false }}  # Set condition to false to make the workflow inactive
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build and Extract Files from Docker Container
+        run: |
+          # Build the Docker image from the Dockerfile in the repository
+          docker build \
+            --build-arg CPU_CORES=$(nproc) \
+            --build-arg TICKER=MOBIC \
+            --build-arg NAME=MobilityCoin \
+            --build-arg BASE_NAME=mobic \
+            --build-arg TARGET=master \
+            -t mobic-linux-x64-build \
+            -f contrib/docker/Dockerfile.dsw-linux-x64-wallet .
+
+          # Start the container (if it's not already running)
+          docker run -d --name mobic-linux-x64-build-container mobic-linux-x64-build
+
+          # Create a temporary directory to hold the extracted files
+          mkdir release_files
+
+          # Copy files from the Docker container to the local filesystem
+          docker cp mobic-linux-x64-build-container:/MOBIC/deploy/linux-x64 release_files/
+
+      - name: Archive and Upload Extracted Files
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-artifacts
+          path: release_files
+  build-files-linux-arm64:
+    runs-on: ubuntu-22.04
+    # if: ${{ false }}  # Set condition to false to make the workflow inactive
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build and Extract Files from Docker Container
+        run: |
+          # Build the Docker image from the Dockerfile in the repository
+          docker build \
+            --build-arg CPU_CORES=$(nproc) \
+            --build-arg TICKER=MOBIC \
+            --build-arg NAME=MobilityCoin \
+            --build-arg BASE_NAME=mobic \
+            --build-arg TARGET=master \
+            -t mobic-linux-arm64-build \
+            -f contrib/docker/Dockerfile.dsw-linux-arm64-wallet .
+
+          # Start the container (if it's not already running)
+          docker run -d --name mobic-linux-arm64-build-container mobic-linux-arm64-build
+
+          # Create a temporary directory to hold the extracted files
+          mkdir release_files
+
+          # Copy files from the Docker container to the local filesystem
+          docker cp mobic-linux-arm64-build-container:/MOBIC/deploy/linux-arm64 release_files/
+
+      - name: Archive and Upload Extracted Files
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-artifacts
+          path: release_files
+  build-windows-x64:
+    runs-on: ubuntu-22.04
+    # if: ${{ false }}  # Set condition to false to make the workflow inactive
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build and Extract Files from Docker Container
+        run: |
+          # Build the Docker image from the Dockerfile in the repository
+          docker build \
+            --build-arg CPU_CORES=$(nproc) \
+            --build-arg TICKER=MOBIC \
+            --build-arg NAME=MobilityCoin \
+            --build-arg BASE_NAME=mobic \
+            --build-arg TARGET=master \
+            -t mobic-windows-x64-build \
+            -f contrib/docker/Dockerfile.dsw-windows-x64-wallet .
+
+          # Start the container (if it's not already running)
+          docker run -d --name mobic-windows-x64-build-container mobic-windows-x64-build
+
+          # Create a temporary directory to hold the extracted files
+          mkdir release_files
+
+          # Copy files from the Docker container to the local filesystem
+          docker cp mobic-windows-x64-build-container:/MOBIC/deploy/windows-x64 release_files/
+
+      - name: Archive and Upload Extracted Files
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-artifacts
+          path: release_files
+  build-macos-x64:
+    runs-on: ubuntu-22.04
+    # if: ${{ false }}  # Set condition to false to make the workflow inactive
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build and Extract Files from Docker Container
+        run: |
+          # Build the Docker image from the Dockerfile in the repository
+          docker build \
+            --build-arg CPU_CORES=$(nproc) \
+            --build-arg TICKER=MOBIC \
+            --build-arg NAME=MobilityCoin \
+            --build-arg BASE_NAME=mobic \
+            --build-arg TARGET=master \
+            -t mobic-macos-x64-build \
+            -f contrib/docker/Dockerfile.dsw-macos-x64-wallet .
+
+          # Start the container (if it's not already running)
+          docker run -d --name mobic-macos-x64-build-container mobic-macos-x64-build
+
+          # Create a temporary directory to hold the extracted files
+          mkdir release_files
+
+          # Copy files from the Docker container to the local filesystem
+          docker cp mobic-macos-x64-build-container:/MOBIC/deploy/macos-x64 release_files/
+
+      - name: Archive and Upload Extracted Files
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-artifacts
+          path: release_files
